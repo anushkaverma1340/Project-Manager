@@ -5,12 +5,21 @@ require('dotenv').config();
 const { graphqlHTTP } = require('express-graphql');
 const schema = require('./schema/schema');
 const connectDB = require('./config/db');
+const path = require("path"); 
 const port = process.env.PORT || 5000;
 
 const app = express();
 
 // Connect to MongoDB
 connectDB();
+
+// Server production assets (frontend)
+if(process.NODE_ENV === "production") {
+    app.use(express.static("client/build"));
+    app.get("*", (req,res) => {
+        res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+    });
+}
 
 app.use(cors());
 
@@ -20,14 +29,3 @@ app.use('/graphql', graphqlHTTP({
 }))
 
 app.listen(port, console.log(`Server runing on port ${port}`));
-
-
-
-
-
-
-
-
-
-
-// MONGO_URI = "mongodb+srv://a_n_u_s_h_k_a:MongoDBSite4@cluster0.z8poenr.mongodb.net/project-manager-db?retryWrites=true&w=majority"
